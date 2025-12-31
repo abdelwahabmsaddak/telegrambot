@@ -1,45 +1,65 @@
 import os
-import logging
+import asyncio
 from telegram import Update
 from telegram.ext import (
     ApplicationBuilder,
+    CommandHandler,
+    MessageHandler,
     ContextTypes,
-    CommandHandler
+    filters,
 )
 
-# logging
-logging.basicConfig(
-    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
-    level=logging.INFO
-)
-
-# token from environment
 TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
 
-if not TOKEN:
-    raise RuntimeError("❌ TELEGRAM_BOT_TOKEN not found in environment variables")
+# ====== أوامر ======
 
-# commands
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text(
-        "🤖 SmartBot يعمل بنجاح!\n\n"
-        "• تحليل السوق\n"
-        "• إشارات ذكية\n"
-        "• تداول آلي (قريبًا)\n"
-        "• تجربة مجانية 15 يوم"
+        "🤖 أهلاً بك في SmartBot\n"
+        "📊 تحليل – 🐋 حيتان – 🤖 ذكاء اصطناعي\n\n"
+        "اكتب /help للمساعدة"
     )
 
-async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await update.message.reply_text("اكتب /start للبدء")
+async def help_cmd(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    await update.message.reply_text(
+        "/start - تشغيل البوت\n"
+        "/analysis - تحليل ذكي\n"
+        "/whales - تتبع الحيتان\n"
+    )
 
-def main():
+async def analysis(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    await update.message.reply_text(
+        "📈 تحليل ذكي (نسخة أولية)\n"
+        "سيتم ربط الذكاء الاصطناعي قريباً"
+    )
+
+async def whales(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    await update.message.reply_text(
+        "🐋 تتبع الحيتان (قيد التطوير)"
+    )
+
+# ====== رسائل عادية ======
+async def echo(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    await update.message.reply_text(
+        "💡 تم استلام رسالتك\n"
+        "الذكاء الاصطناعي سيُفعل لاحقاً"
+    )
+
+# ====== تشغيل البوت ======
+async def main():
+    if not TOKEN:
+        raise RuntimeError("❌ TELEGRAM_BOT_TOKEN غير موجود")
+
     app = ApplicationBuilder().token(TOKEN).build()
 
     app.add_handler(CommandHandler("start", start))
-    app.add_handler(CommandHandler("help", help_command))
+    app.add_handler(CommandHandler("help", help_cmd))
+    app.add_handler(CommandHandler("analysis", analysis))
+    app.add_handler(CommandHandler("whales", whales))
+    app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, echo))
 
-    print("✅ Bot started...")
-    app.run_polling()
+    print("🤖 SmartBot is running...")
+    await app.run_polling()
 
 if __name__ == "__main__":
-    main()
+    asyncio.run(main())
