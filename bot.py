@@ -1,36 +1,33 @@
 import os
 import logging
 from telegram import Update
-from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes
-
-# Logging
-logging.basicConfig(
-    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
-    level=logging.INFO
+from telegram.ext import (
+    ApplicationBuilder,
+    CommandHandler,
+    ContextTypes,
 )
 
 TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
 
 if not TOKEN:
-    raise RuntimeError("TELEGRAM_BOT_TOKEN is missing")
+    raise RuntimeError("TELEGRAM_BOT_TOKEN is not set")
 
-# Commands
+logging.basicConfig(
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+    level=logging.INFO
+)
+
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text(
-        "🤖 SmartBot شغال!\n\nهذا أول إصدار.\nقريب تحليل + تداول + اشتراكات 🔥"
-    )
-
-async def help_cmd(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await update.message.reply_text(
-        "/start - تشغيل البوت\n/help - المساعدة"
+        "🤖 SmartBot خدام ✅\n\nهذا إصدار تجريبي."
     )
 
 def main():
     app = ApplicationBuilder().token(TOKEN).build()
 
     app.add_handler(CommandHandler("start", start))
-    app.add_handler(CommandHandler("help", help_cmd))
 
+    print("🤖 Bot is running...")
     app.run_polling()
 
 if __name__ == "__main__":
