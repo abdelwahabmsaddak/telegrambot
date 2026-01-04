@@ -14,3 +14,6 @@ def ai_analysis(query: str) -> str:
         temperature=0.3,
     )
     return resp.choices[0].message.content.strip()
+
+def analyze(query: str) -> str:
+    return ai_analysis(query)
