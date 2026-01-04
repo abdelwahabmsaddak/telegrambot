@@ -1,19 +1,14 @@
 import os
 from openai import OpenAI
-from prompts import SYSTEM_PROMPT
 
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
-def ai_analysis(query: str) -> str:
-    resp = client.chat.completions.create(
-        model="gpt-4.1-mini",
+def ai_analyze(prompt: str) -> str:
+    response = client.chat.completions.create(
+        model="gpt-4o-mini",
         messages=[
-            {"role": "system", "content": SYSTEM_PROMPT.strip()},
-            {"role": "user", "content": query.strip()},
-        ],
-        temperature=0.3,
+            {"role": "system", "content": "أنت محلل تداول محترف"},
+            {"role": "user", "content": prompt}
+        ]
     )
-    return resp.choices[0].message.content.strip()
-
-def analyze(query: str) -> str:
-    return ai_analysis(query)
+    return response.choices[0].message.content
