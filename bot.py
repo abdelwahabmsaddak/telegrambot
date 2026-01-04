@@ -12,39 +12,39 @@ from trading import trade_signal
 TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
 
 if not TOKEN:
-    raise RuntimeError("TELEGRAM_BOT_TOKEN مش موجود")
+    raise RuntimeError("TELEGRAM_BOT_TOKEN not set")
 
+# /start
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text(
-        "🤖 بوت تداول ذكي جاهز\n"
-        "اكتب:\n"
-        "/ai BTC\n"
-        "/trade BTC"
+        "🤖 بوت تداول ذكي جاهز\n\n"
+        "📝 اكتب:\n"
+        "btc\neth\ngold\n"
     )
 
-async def ai_cmd(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    if not context.args:
-        await update.message.reply_text("استعمل: /ai BTC")
-        return
-    asset = context.args[0]
-    reply = ai_analyze(f"حلل {asset} كأصل مالي")
-    await update.message.reply_text(reply)
+# أي رسالة نصية
+async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    text = update.message.text.strip().lower()
 
-async def trade_cmd(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    if not context.args:
-        await update.message.reply_text("استعمل: /trade BTC")
-        return
-    asset = context.args[0]
-    await update.message.reply_text(trade_signal(asset))
+    if text in ["btc", "eth", "gold"]:
+        signal = trade_signal(text.upper())
+        analysis = ai_analyze(f"حلل {text.upper()} الآن")
+        await update.message.reply_text(signal + "\n\n" + analysis)
+    else:
+        await update.message.reply_text("❓ اكتب: btc أو eth أو gold")
 
 def main():
     app = ApplicationBuilder().token(TOKEN).build()
 
     app.add_handler(CommandHandler("start", start))
-    app.add_handler(CommandHandler("ai", ai_cmd))
-    app.add_handler(CommandHandler("trade", trade_cmd))
+    app.add_handler(
+        MessageHandler(
+            filters.TEXT & ~filters.COMMAND,
+            handle_message
+        )
+    )
 
-    print("✅ BOT STARTED")
+    print("🤖 Bot is running...")
     app.run_polling()
 
 if __name__ == "__main__":
