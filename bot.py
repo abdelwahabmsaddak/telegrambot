@@ -1,4 +1,4 @@
-import os
+import o
 from telegram import Update
 from telegram.ext import (
     ApplicationBuilder,
